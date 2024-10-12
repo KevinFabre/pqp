@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 
 const BASE_URL = "https://api.themoviedb.org/3/";
 const API_KEY = import.meta.env.VITE_TMDB8_API_KEY;
@@ -21,7 +21,7 @@ type MoviePreview = {
   vote_count: number;
 };
 
-type RetrieveTrendingMovies = {
+type RetrieveMovies = {
   page: number;
   results: MoviePreview[];
   total_pages: number;
@@ -79,7 +79,7 @@ type Movie = {
 
 async function retrieveTrendingMovies(
   timeWindow: "day" | "week" = "day"
-): Promise<RetrieveTrendingMovies> {
+): Promise<RetrieveMovies> {
   const response = await fetch(`${BASE_URL}trending/movie/${timeWindow}`, {
     headers: { Authorization: `Bearer ${API_KEY}` },
   });
@@ -89,6 +89,14 @@ async function retrieveTrendingMovies(
 
 async function retrieveMovie(id: number): Promise<Movie> {
   const response = await fetch(`${BASE_URL}movie/${id}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function retrieveSearchMovies(query: string): Promise<RetrieveMovies> {
+  const response = await fetch(`${BASE_URL}search/movie?query=${query}`, {
     headers: { Authorization: `Bearer ${API_KEY}` },
   });
   const data = await response.json();
@@ -107,4 +115,12 @@ const movieQueryOptions = (movieId: number) =>
     queryFn: () => retrieveMovie(movieId),
   });
 
-export { moviesQueryOptions, movieQueryOptions };
+const useRetrieveSearchMovie = (query: string) => {
+  return useQuery({
+    queryKey: ["searchMovie", query] as const,
+    queryFn: ({ queryKey }) => retrieveSearchMovies(queryKey[1]),
+    enabled: !!query,
+  });
+};
+
+export { moviesQueryOptions, movieQueryOptions, useRetrieveSearchMovie };
