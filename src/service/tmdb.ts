@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 
 const BASE_URL = "https://api.themoviedb.org/3/";
 const API_KEY = import.meta.env.VITE_TMDB8_API_KEY;
 
-type Movie = {
+type MoviePreview = {
   adult: boolean;
   backdrop_path: string;
   id: number;
@@ -23,9 +23,58 @@ type Movie = {
 
 type RetrieveTrendingMovies = {
   page: number;
-  results: Movie[];
+  results: MoviePreview[];
   total_pages: number;
   total_result: number;
+};
+
+type Movie = {
+  adult: boolean;
+  backdrop_path: string;
+  belongs_to_collection: null | {
+    id: number;
+    name: string;
+    poster_path: string;
+    backdrop_path: string;
+  };
+  budget: number;
+  genres: {
+    id: number;
+    name: string;
+  }[];
+  homepage: string;
+  id: number;
+  imdb_id: string;
+  origin_country: string[];
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  production_companies: {
+    id: number;
+    logo_path: string;
+    name: string;
+    origin_country: string;
+  }[];
+  production_countries: {
+    iso_3166_1: string;
+    name: string;
+  }[];
+  release_date: string;
+  revenue: number;
+  runtime: number;
+  spoken_languages: {
+    english_name: string;
+    iso_639_1: string;
+    name: string;
+  }[];
+  status: string;
+  tagline: string;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
 };
 
 async function retrieveTrendingMovies(
@@ -38,12 +87,24 @@ async function retrieveTrendingMovies(
   return data;
 }
 
-function useRetrieveTrendingMovies() {
-  const query = useQuery({
-    queryKey: ["useRetrieveTrendingMovies"],
-    queryFn: () => retrieveTrendingMovies(),
+async function retrieveMovie(id: number): Promise<Movie> {
+  const response = await fetch(`${BASE_URL}movie/${id}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
   });
-  return query;
+  const data = await response.json();
+  return data;
 }
 
-export { useRetrieveTrendingMovies };
+const moviesQueryOptions = () =>
+  queryOptions({
+    queryKey: ["movies"],
+    queryFn: () => retrieveTrendingMovies(),
+  });
+
+const movieQueryOptions = (movieId: number) =>
+  queryOptions({
+    queryKey: ["movie", { movieId }],
+    queryFn: () => retrieveMovie(movieId),
+  });
+
+export { moviesQueryOptions, movieQueryOptions };
