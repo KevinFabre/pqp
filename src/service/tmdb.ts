@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-query";
 
 const BASE_URL = "https://api.themoviedb.org/3/";
-const API_KEY = import.meta.env.VITE_TMDB8_API_KEY;
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export type MoviePreview = {
   adult: boolean;
