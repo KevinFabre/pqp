@@ -49,7 +49,6 @@ function MovieMiniCard({ movie }: { movie: MoviePreview }) {
 
 export default function SearchInput() {
   const [searchValue, setSearchValue] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
   const [debouncedSearchValue, setDebouncedSearchValue] = useState(searchValue);
 
   const {
@@ -81,19 +80,17 @@ export default function SearchInput() {
       <input
         value={searchValue}
         onChange={onChange}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
         type="text"
         name="search-movie"
         className={classNames(
           "w-full borderborder-gray-600 bg-gray-300 rounded-lg px-6 py-3 placeholder-gray-500",
           {
-            "rounded-b-none": !!debouncedSearchValue && isFocus,
+            "rounded-b-none": !!debouncedSearchValue,
           }
         )}
         placeholder="Search for a movie"
       />
-      {!!debouncedSearchValue && isFocus && (
+      {!!debouncedSearchValue && (
         <div className="absolute z-10 top-13 left-0 bg-gray-400 right-0 rounded-b-lg">
           {suggestedMovies.map((movie) => {
             return <MovieMiniCard key={movie.id} movie={movie} />;
