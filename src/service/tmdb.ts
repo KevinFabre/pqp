@@ -102,38 +102,38 @@ export type CastMember = {
   order: number;
 };
 
+const fetchFromTMDB = async <T>(
+  endpoint: string,
+  params: string = ""
+): Promise<T> => {
+  const response = await fetch(`${BASE_URL}${endpoint}?${params}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching ${endpoint}: ${response.statusText}`);
+  }
+
+  const data: T = await response.json();
+  return data;
+};
+
 async function retrieveTrendingMovies(
   page: number = 1
 ): Promise<RetrieveMovies> {
-  const response = await fetch(`${BASE_URL}trending/movie/day?page=${page}`, {
-    headers: { Authorization: `Bearer ${API_KEY}` },
-  });
-  const data = await response.json();
-  return data;
+  return fetchFromTMDB<RetrieveMovies>("trending/movie/day", `page=${page}`);
 }
 
 async function retrieveMovie(id: number): Promise<Movie> {
-  const response = await fetch(`${BASE_URL}movie/${id}`, {
-    headers: { Authorization: `Bearer ${API_KEY}` },
-  });
-  const data = await response.json();
-  return data;
+  return fetchFromTMDB<Movie>(`movie/${id}`);
 }
 
 async function retrieveSearchMovies(query: string): Promise<RetrieveMovies> {
-  const response = await fetch(`${BASE_URL}search/movie?query=${query}`, {
-    headers: { Authorization: `Bearer ${API_KEY}` },
-  });
-  const data = await response.json();
-  return data;
+  return fetchFromTMDB<RetrieveMovies>("search/movie", `query=${query}`);
 }
 
 async function retrieveMovieCredits(movieId: number): Promise<RetrieveCredits> {
-  const response = await fetch(`${BASE_URL}movie/${movieId}/credits`, {
-    headers: { Authorization: `Bearer ${API_KEY}` },
-  });
-  const data = await response.json();
-  return data;
+  return fetchFromTMDB<RetrieveCredits>(`movie/${movieId}/credits`);
 }
 
 const trendingMoviesInfiniteOptions = () =>
