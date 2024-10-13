@@ -2,7 +2,10 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      aspectRatio: {
+        poster: "2 / 3",
+      },
+    },
   },
-  plugins: [],
 };

@@ -3,7 +3,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 const BASE_URL = "https://api.themoviedb.org/3/";
 const API_KEY = import.meta.env.VITE_TMDB8_API_KEY;
 
-type MoviePreview = {
+export type MoviePreview = {
   adult: boolean;
   backdrop_path: string;
   id: number;
@@ -28,7 +28,7 @@ type RetrieveMovies = {
   total_result: number;
 };
 
-type Movie = {
+export type Movie = {
   adult: boolean;
   backdrop_path: string;
   belongs_to_collection: null | {
