@@ -81,6 +81,27 @@ export type Movie = {
   vote_count: number;
 };
 
+type RetrieveCredits = {
+  id: number; // Movie ID
+  cast: CastMember[];
+  crew: unknown[];
+};
+
+export type CastMember = {
+  adult: boolean;
+  gender: number;
+  id: number;
+  known_for_department: string;
+  name: string;
+  original_name: string;
+  popularity: number;
+  profile_path: string | null;
+  cast_id: number;
+  character: string;
+  credit_id: string;
+  order: number;
+};
+
 async function retrieveTrendingMovies(
   page: number = 1
 ): Promise<RetrieveMovies> {
@@ -101,6 +122,14 @@ async function retrieveMovie(id: number): Promise<Movie> {
 
 async function retrieveSearchMovies(query: string): Promise<RetrieveMovies> {
   const response = await fetch(`${BASE_URL}search/movie?query=${query}`, {
+    headers: { Authorization: `Bearer ${API_KEY}` },
+  });
+  const data = await response.json();
+  return data;
+}
+
+async function retrieveMovieCredits(movieId: number): Promise<RetrieveCredits> {
+  const response = await fetch(`${BASE_URL}movie/${movieId}/credits`, {
     headers: { Authorization: `Bearer ${API_KEY}` },
   });
   const data = await response.json();
@@ -130,8 +159,16 @@ const useRetrieveSearchMovie = (query: string) => {
   });
 };
 
+const useRetrieveMovieCredits = (movieId: number) => {
+  return useQuery({
+    queryKey: ["movieCreadits", movieId] as const,
+    queryFn: ({ queryKey }) => retrieveMovieCredits(queryKey[1]),
+  });
+};
+
 export {
   trendingMoviesInfiniteOptions,
   movieQueryOptions,
   useRetrieveSearchMovie,
+  useRetrieveMovieCredits,
 };

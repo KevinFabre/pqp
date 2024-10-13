@@ -1,8 +1,15 @@
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Star, Clock, MoveLeft } from "lucide-react";
 
-import { type Movie, movieQueryOptions } from "@/service/tmdb";
+import {
+  type Movie,
+  type CastMember,
+  movieQueryOptions,
+  useRetrieveMovieCredits,
+} from "@/service/tmdb";
+import missingAvatar from "@/assets/missing-avatar.svg";
 
 export const Route = createFileRoute("/movie/$movieId")({
   loader: ({ context: { queryClient }, params: { movieId } }) => {
@@ -81,13 +88,40 @@ function Thumbnail({ movie }: { movie: Movie }) {
   );
 }
 
+function Actor({ actor }: { actor: CastMember }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div
+        className="shrink-0 w-20 h-20 rounded-full bg-center bg-contain border border-gray-800"
+        style={{
+          backgroundImage: `url(${
+            actor.profile_path
+              ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
+              : missingAvatar
+          })`,
+        }}
+      ></div>
+      <div className="text-center">
+        <div>{actor.name}</div>
+        <div className="italic">{actor.character}</div>
+      </div>
+    </div>
+  );
+}
+
 function Content({ movie }: { movie: Movie }) {
+  const { data: credits, isFetched } = useRetrieveMovieCredits(movie.id);
+
+  const creditOrderActors = useMemo(() => {
+    return credits?.cast.sort((a, b) => a.order - b.order) || [];
+  }, [credits]);
+
   return (
     <>
       <h2 className="text-2xl font-semibold mb-4">Overview</h2>
       <p className="text-gray-300 mb-6">{movie.overview}</p>
       <h2 className="text-2xl font-semibold mb-4">Details</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
           <h3 className="font-semibold mb-2">Production Companies</h3>
           <ul className="list-disc list-inside text-gray-300">
@@ -113,6 +147,16 @@ function Content({ movie }: { movie: Movie }) {
           </ul>
         </div>
       </div>
+      {isFetched && (
+        <>
+          <h2 className="text-2xl font-semibold mb-4">Cast</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:col-6 gap-6">
+            {creditOrderActors.map((actor) => (
+              <Actor actor={actor} />
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }
