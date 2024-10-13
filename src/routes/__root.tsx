@@ -1,4 +1,8 @@
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Outlet,
+  ScrollRestoration,
+} from "@tanstack/react-router";
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -10,6 +14,7 @@ export const Route = createRootRoute({
 function RouteComponent() {
   return (
     <>
+      <ScrollRestoration getKey={(location) => location.pathname} />
       <Header />
       <main>
         <Outlet />
